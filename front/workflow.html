@@ -45,10 +45,10 @@
         .map-container {
             width: 70%;
             height: 100%;
-            overflow: hidden; /* 둥근 모서리를 위해 overflow 숨기기 */
-            border-radius: 20px; /* 둥근 모서리 적용 */
+            overflow: hidden;
+            border-radius: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-left: 20px; /* 리스트와 지도의 여백 추가 */
+            margin-left: 20px;
         }
 
         .trash-location {
@@ -60,7 +60,7 @@
             align-items: center;
             margin-bottom: 15px;
             width: 100%;
-            justify-content: space-between; /* Add space between elements */
+            justify-content: space-between;
         }
 
         .trash-location img {
@@ -78,7 +78,6 @@
             transition: text-shadow 0.3s ease;
         }
 
-        /* 텍스트에 주황색 그림자 추가 */
         .highlighted {
             text-shadow: 2px 2px 5px orange;
         }
@@ -92,10 +91,13 @@
         .update-button {
             background-color: #3498db;
             color: white;
-            padding: 5px 10px;
+            padding: 5px 20px;
             border-radius: 5px;
             text-decoration: none;
             font-size: 14px;
+            margin-right: 20px; /* margin-right 설정 */
+            width: 100px; /* 버튼의 width를 넓게 설정 */
+            text-align: center;
         }
 
         .update-button:hover {
@@ -106,8 +108,24 @@
             width: 100%;
             height: 100%;
         }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            .locations-container {
+                width: 100%;
+                padding-right: 0;
+                padding-bottom: 20px;
+            }
+            .map-container {
+                width: 100%;
+                height: 400px;
+                margin-left: 0;
+            }
+        }
     </style>
-    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=o6r34t2t7z"></script> <!-- 네이버 지도 API -->
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=o6r34t2t7z"></script>
 </head>
 <body>
     <h1>청소 대시보드</h1>
@@ -117,7 +135,6 @@
             <div class="locations-container" id="locations-container">
                 <!-- JavaScript로 데이터가 여기 채워질 예정 -->
             </div>
-            <!-- 지도를 둥글게 처리하기 위해 map-container를 추가 -->
             <div class="map-container">
                 <div id="map"></div>
             </div>
@@ -127,17 +144,13 @@
     <script>
         let mapRef = null;
 
-        // 현재 내 위치를 초기 중심으로 설정 (예시 좌표)
-        const currentMyLocation = { lat: 37.537797, lng: 126.944338 }; 
-
-
+        const currentMyLocation = { lat: 37.537797, lng: 126.944338 };
 
         document.addEventListener('DOMContentLoaded', function() {
-            // 지도 생성
             if (currentMyLocation.lat !== 0 && currentMyLocation.lng !== 0) {
                 mapRef = new naver.maps.Map("map", {
                     center: new naver.maps.LatLng(currentMyLocation.lat, currentMyLocation.lng),
-                    zoom: 17, // 지도의 줌 레벨을 17로 설정하여 더 확대한 상태로 시작
+                    zoom: 17,
                     minZoom: 10,
                     zoomControl: true,
                     mapTypeControl: true,
@@ -148,29 +161,21 @@
                 });
             }
 
-            // /d 엔드포인트에서 데이터를 가져옴
             fetch('/d')
                 .then(response => response.json())
                 .then(data => {
-                    let locations = []; // 데이터를 저장할 배열
+                    let locations = [];
                     
                     data.forEach((point, index) => {
-                        if (point.isPreSet) {
-                            point.updateIndex = index; // 초기 인덱스 설정
-                            locations.push({...point, label: locations.length + 1});
-                        } else{
-                            point.updateIndex = index; // 초기 인덱스 설정
-                            locations.push({...point, label: locations.length + 1});
-                        }
+                        point.updateIndex = index;
+                        locations.push({...point, label: locations.length + 1});
                     });
 
-                    // 리스트와 지도에 마커를 추가
                     const container = document.getElementById('locations-container');
                     locations.forEach((point, index) => {
                         const locationDiv = document.createElement('div');
                         locationDiv.className = 'trash-location';
 
-                        // isPreSet이 false인 경우 h2에 highlighted 클래스를 추가
                         const nameClass = point.isPreSet === false ? 'highlighted' : '';
 
                         locationDiv.innerHTML = `
