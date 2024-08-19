@@ -10,6 +10,10 @@
             font-size: 48px;
             color: #28a745;
         }
+        .crossmark {
+            font-size: 48px;
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -45,6 +49,13 @@
                     return `<div class='text-success'>
                                 <h2>처리가 완료되었습니다!</h2>
                                 <div class='checkmark'>✓</div>
+                             </div>`;
+                } else if (status.startsWith('쓰레기가 감지되지 않음')) {
+                    const [message, score] = status.split(': ');
+                    return `<div class='text-info'>
+                                <h2>${message}</h2>
+                                <div class='crossmark'>✗</div>
+                                <p>신뢰도: ${score}%</p>
                              </div>`;
                 }
             }

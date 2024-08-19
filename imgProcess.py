@@ -6,4 +6,4 @@ def prc(img):
     print("이미지 처리 시작...")
     time.sleep(10)  # 10초 동안 처리하는 것처럼 시뮬레이션
     print("이미지 처리 완료!")
-    return "처리된 이미지 경로 또는 결과"
+    return "Fail,32"
