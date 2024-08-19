@@ -42,6 +42,15 @@
             overflow-y: auto;
         }
 
+        .map-container {
+            width: 70%;
+            height: 100%;
+            overflow: hidden; /* 둥근 모서리를 위해 overflow 숨기기 */
+            border-radius: 20px; /* 둥근 모서리 적용 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-left: 20px; /* 리스트와 지도의 여백 추가 */
+        }
+
         .trash-location {
             background-color: #ffffff;
             border-radius: 10px;
@@ -94,10 +103,8 @@
         }
 
         #map {
-            width: 70%;
+            width: 100%;
             height: 100%;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
     </style>
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=o6r34t2t7z"></script> <!-- 네이버 지도 API -->
@@ -110,7 +117,10 @@
             <div class="locations-container" id="locations-container">
                 <!-- JavaScript로 데이터가 여기 채워질 예정 -->
             </div>
-            <div id="map"></div>
+            <!-- 지도를 둥글게 처리하기 위해 map-container를 추가 -->
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
         </div>
     </div>
 
@@ -165,7 +175,7 @@
             if (currentMyLocation.lat !== 0 && currentMyLocation.lng !== 0) {
                 mapRef = new naver.maps.Map("map", {
                     center: new naver.maps.LatLng(currentMyLocation.lat, currentMyLocation.lng),
-                    zoom: 15,
+                    zoom: 17, // 지도의 줌 레벨을 17로 설정하여 더 확대한 상태로 시작
                     minZoom: 10,
                     zoomControl: true,
                     mapTypeControl: true,
