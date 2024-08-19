@@ -11,11 +11,10 @@ executor = ThreadPoolExecutor(max_workers=2)
 
 
 class LocPoint:
-    def __init__(self, latitude, longitude, name, summary, isPreSet=True, image_path=None):
+    def __init__(self, latitude, longitude, name, isPreSet=True, image_path=None):
         self.latitude = latitude
         self.longitude = longitude
         self.name = name
-        self.summary = summary
         self.isPreSet = isPreSet
         self.image_path = image_path
         self.workDone = False
@@ -26,12 +25,12 @@ class LocPoint:
             'latitude': self.latitude,
             'longitude': self.longitude,
             'name': self.name,
-            'summary': self.summary,
             'isPreSet': self.isPreSet,
             'image_path': self.image_path,
             'workDone': self.workDone,
             'result': self.result
         }
+
 
 loc_points = []
 prc_future = None
@@ -57,16 +56,13 @@ def upload():
         if not latitude or not longitude:
             return "위치 정보가 없습니다. 위치 정보를 허용해주세요.", 400
 
-        if not summary:
-            return "쓰레기 요약 정보를 입력해주세요.", 400
-
         if not img:
             return "이미지를 업로드해주세요.", 400
 
         img_path = os.path.join('temp', img.filename)
         img.save(img_path)
 
-        new_point = LocPoint(latitude, longitude, summary, False, img_path, False)
+        new_point = LocPoint(latitude, longitude, summary, False, img_path)
         loc_points.append(new_point)
         current_point_index = len(loc_points) - 1
 
@@ -77,18 +73,53 @@ def upload():
     except Exception as e:
         return f"오류가 발생했습니다: {str(e)}", 500
 
+@app.route('/update/<int:id>', methods=['POST'])
+def uploadWorker():
+    global prc_future, prc_start_time, current_point_index
+
+    try:
+        latitude = request.form['latitude']
+        longitude = request.form['longitude']
+        img = request.files['image']
+
+        if not latitude or not longitude:
+            return "위치 정보가 없습니다. 위치 정보를 허용해주세요.", 400
+
+        if not img:
+            return "이미지를 업로드해주세요.", 400
+
+        img_path = os.path.join('temp', img.filename)
+        img.save(img_path)
+
+        if id < 0 or id >= len(loc_points):
+            abort(404)
+        current_point_index = id
+        
+        loc_point = loc_points[id]
+        loc_point.workDone = True
+
+        prc_future = executor.submit(imgProcess.prc, img_path)
+        prc_start_time = time.time()
+
+        return redirect(url_for('landingWorker'))
+    except Exception as e:
+        return f"오류가 발생했습니다: {str(e)}", 500
+
+
 # '/workflow' 경로에 대한 GET 요청 처리
-
-
 @app.route('/workflow')
 def workflow():
     # workflow.html 템플릿을 렌더링하여 반환합니다.
     return render_template('workflow.html')
 
-
 @app.route('/landing')
 def landing():
     return render_template('landing.html', message='처리 중')
+
+
+@app.route('/landingWorker')
+def landingWorker():
+    return render_template('landingWorker.html')
 
 
 @app.route('/check_status', methods=['GET'])
@@ -127,8 +158,13 @@ def check_status():
 
 
 @app.route('/front/<path:filename>')
-def serve_static(filename):
+def serve_front_static(filename):
     return send_from_directory('front', filename)
+
+
+@app.route('/temp/<path:filename>')
+def serve_temp_static(filename):
+    return send_from_directory('temp', filename)
 
 
 @app.route('/d', methods=['GET'])

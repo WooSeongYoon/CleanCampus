@@ -4,15 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Location Point</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .img-container {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        body {
+            padding-bottom: 30px;
+        }
+    </style>
+    <script>
+        let latitude = '';
+        let longitude = '';
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else { 
+                document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+
+            document.getElementById('latitude').value = latitude;
+            document.getElementById('longitude').value = longitude;
+
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.address) {
+                        const address = data.address;
+                        const city = address.city || address.town || address.village || address.state;
+                        const county = address.county || address.city_district || address.district || "";
+                        const suburb = address.suburb || address.neighbourhood || "";
+                        const fullAddress = `${city} ${county} ${suburb}`.trim();
+                        document.getElementById("location").innerHTML = `현재 위치: ${fullAddress}`;
+                    } else {
+                        document.getElementById("location").innerHTML = "위치 정보를 가져올 수 없습니다.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById("location").innerHTML = "위치 정보를 가져오는 중 오류가 발생했습니다.";
+                });
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("location").innerHTML = "사용자가 위치 정보 제공을 거부했습니다.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("location").innerHTML = "위치 정보가 없습니다.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("location").innerHTML = "위치 정보 요청이 시간 초과되었습니다.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("location").innerHTML = "알 수 없는 오류가 발생했습니다.";
+                    break;
+            }
+        }
+    </script>
 </head>
-<body>
-    <h1>Update Location Point {{ id }}</h1>
-    <p>Latitude: {{ point.latitude }}</p>
-    <p>Longitude: {{ point.longitude }}</p>
-    <p>Name: {{ point.name }}</p>
-    <p>Is Preset: {{ point.isPreSet }}</p>
-    <p>Image Path: {{ point.image_path }}</p>
-    <p>Work Done: {{ point.workDone }}</p>
-    <p>Result: {{ point.result }}</p>
+<body class="container" onload="getLocation()">
+    <h1 class="mt-4 mb-4">Update Location Point {{ id }}</h1>
+    
+    <div class="alert alert-info text-center" role="alert">
+        <h4 id="location">위치 정보를 불러오는 중...</h4>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Latitude:</strong> {{ point.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ point.longitude }}</p>
+            <p><strong>Name:</strong> {{ point.name }}</p>
+            <p><strong>Is Preset:</strong> {{ point.isPreSet }}</p>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Current Image</h5>
+        </div>
+        <div class="card-body">
+            <div class="img-container">
+                <img src="/{{ point.image_path }}" alt="Image for {{ point.name }}" class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Result</h5>
+        </div>
+        <div class="card-body">
+            <p>{{ point.result }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">해당 위치 청소 완료</h5>
+        </div>
+        <div class="card-body">
+            <form id="reportForm" action="/update/{{ id }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="id" name="id" value="{{ id }}">
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+                
+                <div class="form-group">
+                    <h2>새 이미지 업로드:</h2>
+                </div>
+
+                <div class="form-group">
+                    <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">업데이트</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
