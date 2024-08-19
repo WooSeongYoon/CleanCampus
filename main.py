@@ -33,6 +33,11 @@ class LocPoint:
 
 
 loc_points = []
+
+#사전 정의된 위치 주소들
+#loc_points.append(LocPoint())
+
+
 prc_future = None
 prc_start_time = None
 current_point_index = None
@@ -137,6 +142,8 @@ def check_status():
         if isinstance(result, str) and result.startswith('Fail,'):
             loc_points[current_point_index].workDone = True
             a , b = result.split(',')[1], ""
+            if not loc_points.isPreSet: # 사용자 제보만 삭제하는걸루
+                loc_points.pop(current_point_index)
             return f'NotDetect,{a},{b}'
 
         elif isinstance(result, str) and result.startswith('Success,'):
