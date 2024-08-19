@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 홈페이지</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .img-container {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        body {
+            padding-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body class="container">
+    <h1 class="mt-4 mb-4">Update Location Point {{ id }}</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">관리자 수동 선택</h5>
+        </div>
+        <div class="card-body">
+            <div class="text-center">
+                <button type="button" class="btn btn-danger btn-lg">문제가 있습니다</button>
+                <button type="button" class="btn btn-success btn-lg">문제가 없습니다</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Name:</strong> <span style="font-weight: bold; font-size: 1.2em;">{{ point.name }}</span></p>
+            <p><strong>작업 종류:</strong>
+                {% if point.isPreSet %}
+                <span>정규 작업</span>
+                {% else %}
+                <span>사용자 제보</span>
+                {% endif %}
+            </p>
+            <p><strong>작업 완료 여부:</strong>
+                {% if point.workDone %}
+                <span style="color: green;">✅</span>
+                {% else %}
+                <span style="color: red;">❌</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Current Image</h5>
+        </div>
+        <div class="card-body">
+            <div class="img-container">
+                <img src="/{{ point.image_path }}" alt="Image for {{ point.name }}" class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Result</h5>
+        </div>
+        <div class="card-body">
+            <p>{{ point.result }}</p>
+        </div>
+    </div>
+</body>
+
+</html>
