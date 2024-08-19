@@ -12,6 +12,8 @@ app = Flask(__name__, template_folder='front')
 executor = ThreadPoolExecutor(max_workers=2)
 
 # LocPoint 클래스 정의
+
+
 class LocPoint:
     # 클래스 초기화 메서드
     def __init__(self, latitude, longitude, name, isPreSet=True, image_path=None):
@@ -22,7 +24,7 @@ class LocPoint:
         self.image_path = image_path  # 처리할 이미지의 경로
         self.workDone = False  # 작업 완료 여부를 나타내는 bool 속성
         self.result = None  # 처리 결과를 저장할 속성 추가
-        
+
 
 # 전역 변수로 클래스 배열 생성
 loc_points = []
@@ -35,12 +37,16 @@ prc_start_time = None
 current_point_index = None
 
 # 루트 경로에 대한 라우트 설정
+
+
 @app.route('/')
 def index():
     # uploadImg.html 템플릿을 렌더링하여 반환합니다.
     return render_template('uploadImg.html')
 
 # '/upload' 경로에 대한 POST 요청 처리
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     # 전역 변수를 사용하기 위해 global 키워드 사용
@@ -65,17 +71,29 @@ def upload():
     prc_future = executor.submit(imgProcess.prc, img_path)
     # 처리 시작 시간을 기록합니다.
     prc_start_time = time.time()
-    
+
     # landing.html로 리다이렉트합니다.
     return redirect(url_for('landing'))
 
+# '/workflow' 경로에 대한 GET 요청 처리
+
+
+@app.route('/workflow')
+def workflow():
+    # workflow.html 템플릿을 렌더링하여 반환합니다.
+    return render_template('workflow.html')
+
 # '/landing' 경로에 대한 라우트 설정
+
+
 @app.route('/landing')
 def landing():
     # landing.html 템플릿을 렌더링하여 반환합니다.
     return render_template('landing.html', message='처리 중')
 
 # '/check_status' 경로에 대한 GET 요청 처리
+
+
 @app.route('/check_status', methods=['GET'])
 def check_status():
     # 전역 변수를 사용하기 위해 global 키워드 사용
@@ -100,7 +118,7 @@ def check_status():
         if isinstance(result, str) and result.startswith('Fail,'):
             number_after_comma = result.split(',')[1]
             return f'쓰레기가 감지되지 않음: {number_after_comma}'
-        
+
         # 'Success,<number>' 형식에 대한 검사
         elif isinstance(result, str) and result.startswith('Success,'):
             number_after_comma = result.split(',')[1]
@@ -122,12 +140,16 @@ def check_status():
         return f'오류 발생: {str(e)}'
 
 # 정적 파일 서빙을 위한 라우트 설정
+
+
 @app.route('/front/<path:filename>')
 def serve_static(filename):
     # front 디렉토리에서 정적 파일을 서빙합니다.
     return send_from_directory('front', filename)
 
 # '/d' 경로에 대한 GET 요청 처리
+
+
 @app.route('/d', methods=['GET'])
 def get_loc_points():
     # LocPoint 객체를 딕셔너리로 변환
@@ -136,13 +158,16 @@ def get_loc_points():
     return jsonify(loc_points_dict)
 
 # '/update/<int:id>' 경로에 대한 GET 요청 처리
+
+
 @app.route('/update/<int:id>', methods=['GET'])
 def update_loc_point(id):
     if id < 0 or id >= len(loc_points):
         abort(404)  # 잘못된 ID인 경우 404 에러를 반환합니다.
-    
+
     loc_point = loc_points[id]
     return render_template('updateLoc.html', point=loc_point, id=id)
+
 
 # 메인 실행 부분
 if __name__ == '__main__':
