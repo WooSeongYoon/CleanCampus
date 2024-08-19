@@ -65,7 +65,7 @@
             }
         }
 
-        // 폼 제출 시 데이터를 로컬 스토리지에 저장하고 로딩 페이지로 이동하는 함수
+        // 폼 제출 시 데이터를 서버로 전송하는 함수
         function submitForm(event) {
             event.preventDefault();
 
@@ -74,26 +74,19 @@
             formData.append('latitude', latitude);
             formData.append('longitude', longitude);
 
-            // 이미지를 포함한 데이터를 로컬 스토리지에 저장할 수 없으므로, 로컬 스토리지 대신 세션 스토리지에 경로를 저장하거나 로딩 페이지에서 처리하도록 설정
-            const reader = new FileReader();
-            const imageFile = formData.get('image');
-            if (imageFile) {
-                reader.readAsDataURL(imageFile);
-                reader.onload = function () {
-                    sessionStorage.setItem('formData', JSON.stringify({
-                        latitude: latitude,
-                        longitude: longitude,
-                        image: reader.result
-                    }));
-                    window.location.href = '/loading.html';
-                };
-            } else {
-                sessionStorage.setItem('formData', JSON.stringify({
-                    latitude: latitude,
-                    longitude: longitude
-                }));
-                window.location.href = '/loading.html';
-            }
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // 서버 응답 처리
+                document.body.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('제보 전송 중 오류가 발생했습니다.');
+            });
         }
     </script>
 </head>

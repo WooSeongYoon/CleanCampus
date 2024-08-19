@@ -18,7 +18,7 @@ def upload():
     global prc_future
     latitude = request.form['latitude']
     longitude = request.form['longitude']
-    img = request.form['image']
+    img = request.files['image']  # 이 부분을 수정했습니다
 
     print(latitude, longitude)
     # prc() 함수를 비동기적으로 실행하고 Future 객체 저장

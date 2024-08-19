@@ -3,50 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로딩 중...</title>
+    <title>처리 상태 확인</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5 text-center">
-        <h1>제보를 처리 중입니다...</h1>
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
+        <h1>제보 처리 상태</h1>
+        <div id="status-message" class="mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-3">상태를 확인 중입니다...</p>
         </div>
-        <p class="mt-3">잠시만 기다려 주세요.</p>
     </div>
 
     <script>
-        // 이 페이지에서는 실제로 데이터 전송을 처리합니다.
-        function sendData() {
-            const form = localStorage.getItem('formData');
-            if (form) {
-                const formData = new FormData();
-                form.split('&').forEach(pair => {
-                    const [key, value] = pair.split('=');
-                    formData.append(decodeURIComponent(key), decodeURIComponent(value));
-                });
-
-                fetch('/submit-report', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = '/success'; // 성공 시 이동할 페이지
-                    } else {
-                        window.location.href = '/failure'; // 실패 시 이동할 페이지
+        function checkStatus() {
+            fetch('/check_status')
+                .then(response => response.text())
+                .then(status => {
+                    const statusMessage = document.getElementById('status-message');
+                    statusMessage.innerHTML = `<h2>${status}</h2>`;
+                    
+                    if (status === '처리 완료') {
+                        clearInterval(intervalId);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    window.location.href = '/failure'; // 실패 시 이동할 페이지
+                    document.getElementById('status-message').innerHTML = '<h2>오류가 발생했습니다.</h2>';
                 });
-            }
         }
 
-        // 로딩 페이지에서 데이터 전송을 시작합니다.
-        window.onload = sendData;
+        // 페이지 로드 시 즉시 상태 확인
+        checkStatus();
+
+        // 5초마다 상태 확인
+        const intervalId = setInterval(checkStatus, 5000);
     </script>
 </body>
 </html>
