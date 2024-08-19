@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>문제 제보 페이지</title>
+    <title>쓰레기 제보 페이지</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
@@ -73,7 +73,7 @@
 <body onload="getLocation()">
 
     <div class="container mt-5">
-        <h1 class="text-center mb-4">문제 제보 페이지</h1>
+        <h1 class="text-center mb-4">쓰레기 제보 페이지</h1>
 
         <div class="alert alert-info text-center" role="alert">
             <h4 id="location">위치 정보를 불러오는 중...</h4>
@@ -82,31 +82,15 @@
         <form id="reportForm" action="/upload" method="POST" enctype="multipart/form-data">
             <input type="hidden" id="latitude" name="latitude">
             <input type="hidden" id="longitude" name="longitude">
+            
             <div class="form-group">
-                <h2>어떤 문제가 있나요?</h2>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="problem" id="trash" value="쓰레기" required>
-                    <label class="form-check-label" for="trash">
-                        쓰레기
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="problem" id="filth" value="오물">
-                    <label class="form-check-label" for="filth">
-                        오물
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="problem" id="damage" value="파손">
-                    <label class="form-check-label" for="damage">
-                        파손
-                    </label>
-                </div>
+                <h2>쓰레기 요약 정보</h2>
+                <textarea class="form-control" id="summary" name="summary" rows="3" placeholder="쓰레기에 대한 요약 정보를 입력하세요" required></textarea>
             </div>
 
             <div class="form-group">
                 <label for="image">이미지를 업로드 해주세요:</label>
-                <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
+                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
             </div>
 
             <div class="text-center">
