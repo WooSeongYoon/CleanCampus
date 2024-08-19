@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
             max-width: 300px;
             margin: 0 auto;
         }
+
         body {
             padding-bottom: 30px;
         }
@@ -21,7 +23,7 @@
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else { 
+            } else {
                 document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
             }
         }
@@ -56,7 +58,7 @@
         }
 
         function showError(error) {
-            switch(error.code) {
+            switch (error.code) {
                 case error.PERMISSION_DENIED:
                     document.getElementById("location").innerHTML = "사용자가 위치 정보 제공을 거부했습니다.";
                     break;
@@ -73,23 +75,34 @@
         }
     </script>
 </head>
+
 <body class="container" onload="getLocation()">
     <h1 class="mt-4 mb-4">Update Location Point {{ id }}</h1>
-    
+
     <div class="alert alert-info text-center" role="alert">
         <h4 id="location">위치 정보를 불러오는 중...</h4>
     </div>
 
     <div class="card mb-4">
         <div class="card-body">
-            <p><strong>Latitude:</strong> {{ point.latitude }}</p>
-            <p><strong>Longitude:</strong> {{ point.longitude }}</p>
-            <p><strong>Name:</strong> {{ point.name }}</p>
-            <p><strong>Is Preset:</strong> {{ point.isPreSet }}</p>
-            <p><strong>workDone:</strong> {{ point.workDone }}</p>
+            <p><strong>Name:</strong> <span style="font-weight: bold; font-size: 1.2em;">{{ point.name }}</span></p>
+            <p><strong>작업 종류:</strong>
+                {% if point.isPreSet %}
+                <span>정규 작업</span>
+                {% else %}
+                <span>사용자 제보</span>
+                {% endif %}
+            </p>
+            <p><strong>작업 완료 여부:</strong>
+                {% if point.workDone %}
+                <span style="color: green;">✅</span>
+                {% else %}
+                <span style="color: red;">❌</span>
+                {% endif %}
+            </p>
         </div>
     </div>
-    
+
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Current Image</h5>
@@ -100,7 +113,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Result</h5>
@@ -119,7 +132,7 @@
                 <!-- <input type="hidden" id="id" name="id" value="{{ id }}"> -->
                 <input type="hidden" id="latitude" name="latitude">
                 <input type="hidden" id="longitude" name="longitude">
-                
+
                 <div class="form-group">
                     <h2>새 이미지 업로드:</h2>
                 </div>
@@ -135,4 +148,5 @@
         </div>
     </div>
 </body>
+
 </html>

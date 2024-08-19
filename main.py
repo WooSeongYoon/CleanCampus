@@ -81,7 +81,6 @@ def uploadWorker(id):
     try:
         latitude = request.form['latitude']
         longitude = request.form['longitude']
-        # id = request.form['id']
         img = request.files['image']
 
         if not latitude or not longitude:
@@ -96,8 +95,6 @@ def uploadWorker(id):
         if id < 0 or id >= len(loc_points):
             abort(404)
         current_point_index = id
-
-        loc_point = loc_points[id]
 
         prc_future = executor.submit(imgProcess.prc, img_path)
         prc_start_time = time.time()
@@ -134,13 +131,12 @@ def check_status():
 
     try:
         result = prc_future.result(timeout=0.1)
-
         if current_point_index is not None:
             loc_points[current_point_index].result = result
 
         if isinstance(result, str) and result.startswith('Fail,'):
             loc_points[current_point_index].workDone = True
-            a, b = result.split(',')[1], result.split(',')[2]
+            a , b = result.split(',')[1], ""
             return f'NotDetect,{a},{b}'
 
         elif isinstance(result, str) and result.startswith('Success,'):
@@ -154,7 +150,6 @@ def check_status():
             return '처리 지연'
     except Exception as e:
         if current_point_index is not None:
-            loc_points[current_point_index].workDone = True
             loc_points[current_point_index].result = str(e)
         return f'오류 발생: {str(e)}'
 

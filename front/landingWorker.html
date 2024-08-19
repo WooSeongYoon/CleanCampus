@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>처리 상태 확인</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .checkmark {
+            font-size: 48px;
+            color: #28a745;
+        }
+
+        .crossmark {
+            font-size: 48px;
+            color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5 text-center">
+        <h1>제출 중 입니다.</h1>
+        <div id="status-message" class="mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-3">상태를 확인 중입니다...</p>
+        </div>
+        <div id="back-button" class="mt-4" style="display: none;">
+            <a href="/workflow" class="btn btn-secondary">workFlow로 돌아가기</a>
+        </div>
+    </div>
+
+    <script>
+        class StatusAnimations {
+            get_animation(status) {
+                if (status === '처리 중') {
+                    return `<div class='spinner-border text-primary' role='status'>
+                        <span class='sr-only'>Loading...</span>
+                     </div>
+                     <p class='mt-3'>상태를 확인 중입니다...</p>`;
+                } else if (status === '처리 지연') {
+                    return `<div class='spinner-border text-primary' role='status'>
+                        <span class='sr-only'>처리 지연</span>
+                     </div>
+                     <p class='mt-3'>처리 실패 !</p>`;
+                } else if (status.startsWith('NotDetect')) {
+                    const [_, score, message] = status.split(',');
+                    return `<div class='text-success'>
+                        <div class='checkmark'>✓</div>
+                        <h2>깨끗합니다. 수고하셨습니다.</h2>
+                        <p>${message}</p>
+                        <p>신뢰도: ${score}%</p>
+                     </div>`;
+                } else if (status.startsWith('Detect')) {
+                    const [_, score, message] = status.split(',');
+                    return `<div class='text-danger'>
+                        <h2>더러운 환경이 또 한번 감지 되었어요. 다시 시도 해주세요.</h2>
+                        <div class='crossmark'>✗</div>
+                        <p>${message}</p>
+                        <p>신뢰도: ${score}%</p>
+                     </div>`;
+                } else {
+                    return `<h2 class="text-danger">알 수 없는 상태: ${status}</h2>`;
+                }
+            }
+        }
+
+        const statusAnimation = new StatusAnimations();
+
+        function checkStatus() {
+            fetch('/check_status')
+                .then(response => response.text())
+                .then(status => {
+                    const statusMessage = document.getElementById('status-message');
+                    statusMessage.innerHTML = statusAnimation.get_animation(status);
+
+                    if (status !== '처리 중') {
+                        document.getElementById('back-button').style.display = 'block';
+                        clearInterval(intervalId);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('status-message').innerHTML = '<h2 class="text-danger">오류가 발생했습니다.</h2>';
+                    document.getElementById('back-button').style.display = 'block';
+                });
+        }
+
+        // 페이지 로드 시 즉시 상태 확인
+        checkStatus();
+
+        // 5초마다 상태 확인
+        const intervalId = setInterval(checkStatus, 5000);
+    </script>
+</body>
+
+</html>
