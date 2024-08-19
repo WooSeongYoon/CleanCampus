@@ -6,19 +6,32 @@ import time
 import json
 
 app = Flask(__name__, template_folder='front')
+app.config['JSON_AS_ASCII'] = False
 executor = ThreadPoolExecutor(max_workers=2)
 
 
 class LocPoint:
-    def __init__(self, latitude, longitude, name="", isPreSet=True, image_path=None, workDone=False, result=""):
+    def __init__(self, latitude, longitude, name, summary, isPreSet=True, image_path=None):
         self.latitude = latitude
         self.longitude = longitude
         self.name = name
+        self.summary = summary
         self.isPreSet = isPreSet
         self.image_path = image_path
-        self.workDone = workDone
-        self.result = result
+        self.workDone = False
+        self.result = None
 
+    def to_dict(self):
+        return {
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'name': self.name,
+            'summary': self.summary,
+            'isPreSet': self.isPreSet,
+            'image_path': self.image_path,
+            'workDone': self.workDone,
+            'result': self.result
+        }
 
 loc_points = []
 prc_future = None
@@ -120,8 +133,8 @@ def serve_static(filename):
 
 @app.route('/d', methods=['GET'])
 def get_loc_points():
-    loc_points_dict = [vars(point) for point in loc_points]
-    return jsonify(loc_points_dict)
+    loc_points_dict = [point.to_dict() for point in loc_points]
+    return json.dumps(loc_points_dict, ensure_ascii=False)
 
 
 @app.route('/update/<int:id>', methods=['GET'])
