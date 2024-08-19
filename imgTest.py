@@ -66,4 +66,6 @@ def prc(img_path):
         return f"Success, {average_probability:.2f}, {text}"
 
 # 사용 예시
-prc("./c.jpg")
+if __name__ == "__main__":
+    print("1")
+    print(prc('aiTest/t.jpg'))
