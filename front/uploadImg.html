@@ -8,6 +8,9 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <script>
+        let latitude = '';
+        let longitude = '';
+
         // 현재 위치를 가져오는 함수
         function getLocation() {
             if (navigator.geolocation) {
@@ -19,10 +22,9 @@
 
         // 위치 정보를 가져온 후 지역명을 표시하는 함수
         function showPosition(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
 
-            // Nominatim API를 사용해 지역명 가져오기
             const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
 
             fetch(url)
@@ -30,9 +32,8 @@
                 .then(data => {
                     if (data && data.address) {
                         const address = data.address;
-                        // "시", "구", "동" 정보를 추출하여 표시
                         const city = address.city || address.town || address.village || address.state;
-                        const county = address.county || address.district || "";
+                        const county = address.county || address.city_district || address.district || "";
                         const suburb = address.suburb || address.neighbourhood || "";
                         const fullAddress = `${city} ${county} ${suburb}`.trim();
                         document.getElementById("location").innerHTML = `현재 위치: ${fullAddress}`;
@@ -46,7 +47,7 @@
                 });
         }
 
-        // 오류 처리 함수
+        // 위치 정보를 가져오지 못한 경우
         function showError(error) {
             switch(error.code) {
                 case error.PERMISSION_DENIED:
@@ -63,6 +64,37 @@
                     break;
             }
         }
+
+        // 폼 제출 시 데이터를 로컬 스토리지에 저장하고 로딩 페이지로 이동하는 함수
+        function submitForm(event) {
+            event.preventDefault();
+
+            const form = document.getElementById("reportForm");
+            const formData = new FormData(form);
+            formData.append('latitude', latitude);
+            formData.append('longitude', longitude);
+
+            // 이미지를 포함한 데이터를 로컬 스토리지에 저장할 수 없으므로, 로컬 스토리지 대신 세션 스토리지에 경로를 저장하거나 로딩 페이지에서 처리하도록 설정
+            const reader = new FileReader();
+            const imageFile = formData.get('image');
+            if (imageFile) {
+                reader.readAsDataURL(imageFile);
+                reader.onload = function () {
+                    sessionStorage.setItem('formData', JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude,
+                        image: reader.result
+                    }));
+                    window.location.href = '/loading.html';
+                };
+            } else {
+                sessionStorage.setItem('formData', JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                }));
+                window.location.href = '/loading.html';
+            }
+        }
     </script>
 </head>
 <body onload="getLocation()">
@@ -70,13 +102,11 @@
     <div class="container mt-5">
         <h1 class="text-center mb-4">문제 제보 페이지</h1>
 
-        <!-- 현재 위치 표시 영역 -->
         <div class="alert alert-info text-center" role="alert">
             <h4 id="location">위치 정보를 불러오는 중...</h4>
         </div>
 
-        <!-- 문제 유형 선택 폼 -->
-        <form id="reportForm" action="/upload" method="POST" enctype="multipart/form-data">
+        <form id="reportForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
             <div class="form-group">
                 <h2>어떤 문제가 있나요?</h2>
                 <div class="form-check">
@@ -99,20 +129,17 @@
                 </div>
             </div>
 
-            <!-- 이미지 업로드 폼 -->
             <div class="form-group">
-                <label for="problemImage">이미지를 업로드 해주세요:</label>
-                <input type="file" class="form-control-file" id="problemImage" name="problemImage" accept="image/*">
+                <label for="image">이미지를 업로드 해주세요:</label>
+                <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
             </div>
 
-            <!-- 서버로 전송하는 버튼 -->
             <div class="text-center">
                 <button type="submit" class="btn btn-primary btn-lg">제보하기</button>
             </div>
         </form>
     </div>
 
-    <!-- Bootstrap JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
