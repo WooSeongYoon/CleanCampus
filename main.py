@@ -35,7 +35,9 @@ class LocPoint:
 loc_points = []
 
 #사전 정의된 위치 주소들
-#loc_points.append(LocPoint())
+loc_points.append(LocPoint(37.537797, 126.944338, "한신오피스텔", True))
+loc_points.append(LocPoint(37.539235, 126.945453, "마포역", True))
+loc_points.append(LocPoint(37.537796, 126.945050, "서울경찰청 금융범죄수사대", True))
 
 
 prc_future = None
