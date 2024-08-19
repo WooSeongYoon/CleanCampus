@@ -30,6 +30,10 @@ class LocPoint:
             'result': self.result
         }
 
+prc_future = None
+prc_start_time = None
+current_point_index = None
+
 loc_points = [
     LocPoint(37.537797, 126.944338, "한신오피스텔", True),
     LocPoint(37.539235, 126.945453, "마포역", True),
