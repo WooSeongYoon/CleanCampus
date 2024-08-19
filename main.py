@@ -1,10 +1,13 @@
 from flask import Flask, request, render_template, send_from_directory
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, Future
 import imgProcess
 import os
 
 app = Flask(__name__, template_folder='front')
 executor = ThreadPoolExecutor(max_workers=2)
+
+# prc 실행의 Future를 저장할 전역 변수
+prc_future = None
 
 @app.route('/')
 def index():
@@ -12,23 +15,24 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    global prc_future
     latitude = request.form['latitude']
     longitude = request.form['longitude']
-    imgFilePath = request.form['imgFilePath']
-    
-    # prc() 함수를 비동기적으로 실행
-    executor.submit(imgProcess.prc, imgFilePath)
+    img = request.form['image']
+
+    print(latitude, longitude)
+    # prc() 함수를 비동기적으로 실행하고 Future 객체 저장
+    prc_future = executor.submit(imgProcess.prc, img)
     
     # 처리 중 메시지와 함께 landing.html 렌더링
     return render_template('landing.html', message='처리 중')
 
 @app.route('/check_status', methods=['GET'])
 def check_status():
-    # 여기서 prc() 함수의 완료 여부를 확인하는 로직을 구현해야 합니다.
-    # 이 예제에서는 간단히 항상 완료되었다고 가정합니다.
-    is_completed = True
-    
-    if is_completed:
+    global prc_future
+    if prc_future is None:
+        return '처리 중'
+    elif prc_future.done():
         return '처리 완료'
     else:
         return '처리 중'
