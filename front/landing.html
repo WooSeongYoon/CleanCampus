@@ -1,59 +1,23 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket 숫자 수신</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+    <title>이미지 처리 상태</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function checkStatus() {
+            $.get('/check_status', function(data) {
+                $('#status').text(data);
+                if (data === '처리 완료') {
+                    clearInterval(intervalId);
+                }
+            });
         }
-        #numberDisplay {
-            font-size: 48px;
-            font-weight: bold;
-            color: #333;
-            background-color: white;
-            padding: 20px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+        
+        var intervalId = setInterval(checkStatus, 5000); // 5초마다 상태 확인
+    </script>
 </head>
 <body>
-    <div id="numberDisplay">대기 중...</div>
-
-    <script>
-        // WebSocket 연결
-        const socket = new WebSocket('ws://localhost:8765');
-
-        // 연결이 열렸을 때
-        socket.addEventListener('open', (event) => {
-            console.log('WebSocket 연결이 열렸습니다.');
-        });
-
-        // 메시지를 받았을 때
-        socket.addEventListener('message', (event) => {
-            console.log('서버로부터 메시지를 받았습니다:', event.data);
-            document.getElementById('numberDisplay').textContent = event.data;
-        });
-
-        // 연결이 닫혔을 때
-        socket.addEventListener('close', (event) => {
-            console.log('WebSocket 연결이 닫혔습니다.');
-            document.getElementById('numberDisplay').textContent = '연결 종료';
-        });
-
-        // 에러가 발생했을 때
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket 에러:', event);
-            document.getElementById('numberDisplay').textContent = '에러 발생';
-        });
-    </script>
+    <h1>이미지 처리 상태</h1>
+    <p>현재 상태: <span id="status">{{ message }}</span></p>
 </body>
 </html>
