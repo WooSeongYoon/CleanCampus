@@ -1,9 +1,9 @@
 import time
 
-def prc():
-    for i in range(1, 11):
-        print(i)
-        time.sleep(1)  # 1초 대기
-
-if __name__ == "__main__":
-    prc()
+def prc(img):
+    # 이미지 처리 로직을 여기에 구현합니다.
+    # 예를 들어, 이미지를 저장하고 처리하는 과정을 시뮬레이션합니다.
+    print("이미지 처리 시작...")
+    time.sleep(10)  # 10초 동안 처리하는 것처럼 시뮬레이션
+    print("이미지 처리 완료!")
+    return "처리된 이미지 경로 또는 결과"

@@ -25,6 +25,10 @@
             latitude = position.coords.latitude;
             longitude = position.coords.longitude;
 
+            // hidden input 필드에 위도와 경도 설정
+            document.getElementById('latitude').value = latitude;
+            document.getElementById('longitude').value = longitude;
+
             const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
 
             fetch(url)
@@ -64,30 +68,6 @@
                     break;
             }
         }
-
-        // 폼 제출 시 데이터를 서버로 전송하는 함수
-        function submitForm(event) {
-            event.preventDefault();
-
-            const form = document.getElementById("reportForm");
-            const formData = new FormData(form);
-            formData.append('latitude', latitude);
-            formData.append('longitude', longitude);
-
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                // 서버 응답 처리
-                document.body.innerHTML = data;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('제보 전송 중 오류가 발생했습니다.');
-            });
-        }
     </script>
 </head>
 <body onload="getLocation()">
@@ -99,7 +79,9 @@
             <h4 id="location">위치 정보를 불러오는 중...</h4>
         </div>
 
-        <form id="reportForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
+        <form id="reportForm" action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
             <div class="form-group">
                 <h2>어떤 문제가 있나요?</h2>
                 <div class="form-check">
