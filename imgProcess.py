@@ -27,4 +27,8 @@ def prc(img):
             del a[0]
             del a[0]
 
-        return ("Success," + str(probability/len(textList)) + text)
+        return ("Success," + str(probability/len(textList)) +"," + text)
+
+if __name__ == "__main__":
+    print("1")
+    print(prc('aiTest/t.jpg'))
