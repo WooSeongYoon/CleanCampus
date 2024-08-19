@@ -61,6 +61,12 @@ def upload():
     except Exception as e:
         return f"오류가 발생했습니다: {str(e)}", 500
 
+# '/workflow' 경로에 대한 GET 요청 처리
+@app.route('/workflow')
+def workflow():
+    # workflow.html 템플릿을 렌더링하여 반환합니다.
+    return render_template('workflow.html')
+
 @app.route('/landing')
 def landing():
     return render_template('landing.html', message='처리 중')
