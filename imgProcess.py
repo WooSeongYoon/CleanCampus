@@ -6,5 +6,5 @@ def prc(img):
     print("이미지 처리 시작...")
     time.sleep(10)  # 10초 동안 처리하는 것처럼 시뮬레이션
     print("이미지 처리 완료!")
-    # return "Fail,32"
-    return "Success, 89"
+    # return "Fail,32, 캔 물티슈"
+    return "Success, 81, 캔 물티슈"

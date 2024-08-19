@@ -1,5 +1,5 @@
 # 필요한 모듈들을 임포트합니다.
-from flask import Flask, request, render_template, send_from_directory, redirect, url_for, jsonify
+from flask import Flask, request, render_template, send_from_directory, redirect, url_for, jsonify, abort
 from concurrent.futures import ThreadPoolExecutor, Future, TimeoutError
 import imgProcess
 import os
@@ -22,6 +22,7 @@ class LocPoint:
         self.image_path = image_path  # 처리할 이미지의 경로
         self.workDone = False  # 작업 완료 여부를 나타내는 bool 속성
         self.result = None  # 처리 결과를 저장할 속성 추가
+        
 
 # 전역 변수로 클래스 배열 생성
 loc_points = []
@@ -133,6 +134,15 @@ def get_loc_points():
     loc_points_dict = [vars(point) for point in loc_points]
     # JSON으로 변환하여 반환 (들여쓰기 적용)
     return jsonify(loc_points_dict)
+
+# '/update/<int:id>' 경로에 대한 GET 요청 처리
+@app.route('/update/<int:id>', methods=['GET'])
+def update_loc_point(id):
+    if id < 0 or id >= len(loc_points):
+        abort(404)  # 잘못된 ID인 경우 404 에러를 반환합니다.
+    
+    loc_point = loc_points[id]
+    return render_template('updateLoc.html', point=loc_point, id=id)
 
 # 메인 실행 부분
 if __name__ == '__main__':
