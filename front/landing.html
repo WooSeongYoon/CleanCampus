@@ -57,6 +57,13 @@
                                 <div class='crossmark'>✗</div>
                                 <p>신뢰도: ${score}%</p>
                              </div>`;
+                } else if (status.startsWith('쓰레기가 감지됨')) {
+                    const [message, score] = status.split(': ');
+                    return `<div class='text-success'>
+                                <h2>${message}</h2>
+                                <div class='checkmark'>✓</div>
+                                <p>신뢰도: ${score}%</p>
+                             </div>`;
                 }
             }
         }
