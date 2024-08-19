@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>처리 상태 확인</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .checkmark {
+            font-size: 48px;
+            color: #28a745;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5 text-center">
@@ -15,24 +21,53 @@
             </div>
             <p class="mt-3">상태를 확인 중입니다...</p>
         </div>
+        <div id="back-button" class="mt-4" style="display: none;">
+            <a href="/" class="btn btn-secondary">제보 페이지로 돌아가기</a>
+        </div>
     </div>
 
     <script>
-        console.log("check!")
+        class StatusAnimations {
+            get_animation(status) {
+                if (status === '처리 중') {
+                    return `<div class='spinner-border text-primary' role='status'>
+                                <span class='sr-only'>Loading...</span>
+                             </div>
+                             <p class='mt-3'>상태를 확인 중입니다...</p>`;
+                } else if (status === '처리 지연') {
+                    return `<div class='text-warning'>
+                                <h2>처리 지연 중...</h2>
+                                <div class='spinner-border text-warning' role='status'>
+                                    <span class='sr-only'>Processing...</span>
+                                </div>
+                             </div>`;
+                } else if (status === '처리 완료') {
+                    return `<div class='text-success'>
+                                <h2>처리가 완료되었습니다!</h2>
+                                <div class='checkmark'>✓</div>
+                             </div>`;
+                }
+            }
+        }
+
+        const statusAnimation = new StatusAnimations();
+
         function checkStatus() {
             fetch('/check_status')
                 .then(response => response.text())
                 .then(status => {
                     const statusMessage = document.getElementById('status-message');
-                    statusMessage.innerHTML = `<h2>${status}</h2>`;
+                    statusMessage.innerHTML = statusAnimation.get_animation(status);
                     
-                    if (status === '처리 완료') {
+                    if (status !== '처리 중') {
+                        document.getElementById('back-button').style.display = 'block';
                         clearInterval(intervalId);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    document.getElementById('status-message').innerHTML = '<h2>오류가 발생했습니다.</h2>';
+                    document.getElementById('status-message').innerHTML = '<h2 class="text-danger">오류가 발생했습니다.</h2>';
+                    document.getElementById('back-button').style.display = 'block';
                 });
         }
 
