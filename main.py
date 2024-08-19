@@ -120,7 +120,7 @@ def workflow():
 
 @app.route('/landing')
 def landing():
-    return render_template('landing.html', message='처리 중')
+    return render_template('landing.html', message='처리 중', id=current_point_index)
 
 @app.route('/landingWorker')
 def landingWorker():

@@ -31,6 +31,9 @@
         <div id="back-button" class="mt-4" style="display: none;">
             <a href="/" class="btn btn-secondary">제보 페이지로 돌아가기</a>
         </div>
+        <div id="about-button" class="mt-4" style="display: none;">
+            <a href="/updates/{{ id }}" class="btn btn-secondary">상세 페이지 열람</a>
+        </div>
     </div>
 
     <script>
@@ -79,6 +82,7 @@
 
                     if (status !== '처리 중') {
                         document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('about-button').style.display = 'block';
                         clearInterval(intervalId);
                     }
                 })
