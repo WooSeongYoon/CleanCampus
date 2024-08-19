@@ -86,6 +86,7 @@
             <p><strong>Longitude:</strong> {{ point.longitude }}</p>
             <p><strong>Name:</strong> {{ point.name }}</p>
             <p><strong>Is Preset:</strong> {{ point.isPreSet }}</p>
+            <p><strong>workDone:</strong> {{ point.workDone }}</p>
         </div>
     </div>
     
@@ -115,7 +116,7 @@
         </div>
         <div class="card-body">
             <form id="reportForm" action="/update/{{ id }}" method="POST" enctype="multipart/form-data">
-                <input type="hidden" id="id" name="id" value="{{ id }}">
+                <!-- <input type="hidden" id="id" name="id" value="{{ id }}"> -->
                 <input type="hidden" id="latitude" name="latitude">
                 <input type="hidden" id="longitude" name="longitude">
                 
@@ -128,7 +129,7 @@
                 </div>
 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary btn-lg">업데이트</button>
+                    <button type="submit" class="btn btn-primary btn-lg">청소를 완료했습니다</button>
                 </div>
             </form>
         </div>

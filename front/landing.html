@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +11,14 @@
             font-size: 48px;
             color: #28a745;
         }
+
         .crossmark {
             font-size: 48px;
             color: #dc3545;
         }
     </style>
 </head>
+
 <body>
     <div class="container mt-5 text-center">
         <h1>제보 처리 상태</h1>
@@ -35,35 +38,32 @@
             get_animation(status) {
                 if (status === '처리 중') {
                     return `<div class='spinner-border text-primary' role='status'>
-                                <span class='sr-only'>Loading...</span>
-                             </div>
-                             <p class='mt-3'>상태를 확인 중입니다...</p>`;
+                        <span class='sr-only'>Loading...</span>
+                     </div>
+                     <p class='mt-3'>상태를 확인 중입니다...</p>`;
                 } else if (status === '처리 지연') {
-                    return `<div class='text-warning'>
-                                <h2>처리 지연 중...</h2>
-                                <div class='spinner-border text-warning' role='status'>
-                                    <span class='sr-only'>Processing...</span>
-                                </div>
-                             </div>`;
-                } else if (status === '처리 완료') {
+                    return `<div class='spinner-border text-primary' role='status'>
+                        <span class='sr-only'>처리 지연</span>
+                     </div>
+                     <p class='mt-3'>처리 실패 !</p>`;
+                } else if (status.startsWith('NotDetect')) {
+                    const [_, score, message] = status.split(',');
+                    return `<div class='text-danger'>
+                        <div class='crossmark'>✗</div>
+                        <h2>더러운 환경이 감지 되지 않았어요</h2>
+                        <p>${message}</p>
+                        <p>신뢰도: ${score}%</p>
+                     </div>`;
+                } else if (status.startsWith('Detect')) {
+                    const [_, score, message] = status.split(',');
                     return `<div class='text-success'>
-                                <h2>처리가 완료되었습니다!</h2>
-                                <div class='checkmark'>✓</div>
-                             </div>`;
-                } else if (status.startsWith('쓰레기가 감지되지 않음')) {
-                    const [message, score] = status.split(': ');
-                    return `<div class='text-info'>
-                                <h2>${message}</h2>
-                                <div class='crossmark'>✗</div>
-                                <p>신뢰도: ${score}%</p>
-                             </div>`;
-                } else if (status.startsWith('쓰레기가 감지됨')) {
-                    const [message, score] = status.split(': ');
-                    return `<div class='text-success'>
-                                <h2>${message}</h2>
-                                <div class='checkmark'>✓</div>
-                                <p>신뢰도: ${score}%</p>
-                             </div>`;
+                        <h2>더러운 환경이 감지 되어 신고 되었어요</h2>
+                        <div class='checkmark'>✓</div>
+                        <p>${message}</p>
+                        <p>신뢰도: ${score}%</p>
+                     </div>`;
+                } else {
+                    return `<h2 class="text-danger">알 수 없는 상태: ${status}</h2>`;
                 }
             }
         }
@@ -76,7 +76,7 @@
                 .then(status => {
                     const statusMessage = document.getElementById('status-message');
                     statusMessage.innerHTML = statusAnimation.get_animation(status);
-                    
+
                     if (status !== '처리 중') {
                         document.getElementById('back-button').style.display = 'block';
                         clearInterval(intervalId);
@@ -96,4 +96,5 @@
         const intervalId = setInterval(checkStatus, 5000);
     </script>
 </body>
+
 </html>

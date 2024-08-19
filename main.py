@@ -73,13 +73,15 @@ def upload():
     except Exception as e:
         return f"오류가 발생했습니다: {str(e)}", 500
 
+
 @app.route('/update/<int:id>', methods=['POST'])
-def uploadWorker():
+def uploadWorker(id):
     global prc_future, prc_start_time, current_point_index
 
     try:
         latitude = request.form['latitude']
         longitude = request.form['longitude']
+        # id = request.form['id']
         img = request.files['image']
 
         if not latitude or not longitude:
@@ -94,9 +96,8 @@ def uploadWorker():
         if id < 0 or id >= len(loc_points):
             abort(404)
         current_point_index = id
-        
+
         loc_point = loc_points[id]
-        loc_point.workDone = True
 
         prc_future = executor.submit(imgProcess.prc, img_path)
         prc_start_time = time.time()
@@ -111,6 +112,7 @@ def uploadWorker():
 def workflow():
     # workflow.html 템플릿을 렌더링하여 반환합니다.
     return render_template('workflow.html')
+
 
 @app.route('/landing')
 def landing():
@@ -137,14 +139,14 @@ def check_status():
             loc_points[current_point_index].result = result
 
         if isinstance(result, str) and result.startswith('Fail,'):
-            number_after_comma = result.split(',')[1]
-            return f'쓰레기가 감지되지 않음: {number_after_comma}'
+            loc_points[current_point_index].workDone = True
+            a, b = result.split(',')[1], result.split(',')[2]
+            return f'NotDetect,{a},{b}'
 
         elif isinstance(result, str) and result.startswith('Success,'):
-            number_after_comma = result.split(',')[1]
-            return f'쓰레기가 감지됨: {number_after_comma}'
-
-        return '처리 완료'
+            loc_points[current_point_index].workDone = False
+            a, b = result.split(',')[1], result.split(',')[2]
+            return f'Detect,{a},{b}'
     except TimeoutError:
         if elapsed_time < 60:
             return '처리 중'
