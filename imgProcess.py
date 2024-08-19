@@ -1,10 +1,30 @@
-import time
-
 def prc(img):
-    # 이미지 처리 로직을 여기에 구현합니다.
-    # 예를 들어, 이미지를 저장하고 처리하는 과정을 시뮬레이션합니다.
-    print("이미지 처리 시작...")
-    time.sleep(10)  # 10초 동안 처리하는 것처럼 시뮬레이션
-    print("이미지 처리 완료!")
-    # return "Fail,32"
-    return "Success, 89"
+    from inference_sdk import InferenceHTTPClient
+    
+    CLIENT = InferenceHTTPClient(
+        api_url="https://detect.roboflow.com",
+        api_key="EJA9JwWYfAVqqZ3kLOhz"
+    )
+    
+    result = CLIENT.infer(img, model_id="ultimate-rqkdd/1")
+
+    textList = []
+
+    if 'predictions' in result:
+        for prediction in result['predictions']:
+            textList.append([prediction['class'], ((round(prediction['confidence'], 2))*100)])
+
+    if textList == []:
+        return "Fail, 0"
+    
+    else:
+        probability = 0
+        text = ""
+
+        for a in textList:
+            text += a[0] + " "
+            probability += int(a[1])
+            del a[0]
+            del a[0]
+
+        return ("Success," + str(probability/len(textList)) + text)
