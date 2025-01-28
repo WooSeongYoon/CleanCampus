@@ -3,7 +3,7 @@ Clean Campus는 환경미화원, 봉사자, 그리고 제보자의 협력을 통
 
 <h2>대구대학교 All In One 팀</h2>
 프로젝트 노션 링크: https://chief-enemy-fd0.notion.site/_-2a1cf79edfa143db9657f90c1745d08a?pvs=74   
-시연 영상 링크: https://youtu.be/z12tc2iDGzw
+시연 영상 링크: https://youtu.be/z12tc2iDGzw   
 <brtr</b>
 <ppip 웹소켓 설치</p>
 <ppip 설치 추론-sdk</p>
